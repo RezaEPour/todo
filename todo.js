@@ -1,63 +1,27 @@
+import { renderList } from "./dom.js";
+import { onAddItem, onDeleteAll, onType } from "./events.js";
+import { get_todos_list } from "./api/todos.js";
+import { reset } from "./store.js";
 
-const btn = document.querySelector("#save-btn")
-const title = document.querySelector("#title")
-const list = document.querySelector(".list")
+const save_button = document.querySelector("#save-btn");
+const deleteAll = document.querySelector(".delete-all");
+const todo_input = document.querySelector("#title");
 
-const todo_list = []
+// Run App
 
-function makeItem(value){
-
-    const item = document.createElement("div");   
-        item.classList.add("item")
-
-        const checkbox = document.createElement("input")
-        checkbox.setAttribute("type", "checkbox")
-
-        const span = document.createElement("span")
-        span.textContent = value
-        
-        list.appendChild(checkbox)
-
-        list.appendChild(span)
-
-        list.appendChild(item)
-
-
+function events() {
+  save_button.addEventListener("click", onAddItem);
+  deleteAll.addEventListener("click", onDeleteAll);
+  todo_input.addEventListener("keyup", onType);
 }
-function syncStorage(title){
 
-    todo_list.push(title)
-    const next_list = JSON.stringify(todo_list)
-    localStorage.setItem("my_list", next_list)
+function init() {
+  get_todos_list().then((list) => {
+    reset(list);
+    renderList();
+  });
 
-
+  events();
 }
-btn.addEventListener("click", () =>{
-    const val = title.value
-    
 
-    if (val === ""){
-    alert("you should write a title")
-
-    }
-    else{
-
-       syncStorage(val)
-        
-        makeItem(val)
-        title.value = ""
-       
-    }
-})
-
-
-
-const previous_list = JSON.parse(localStorage.getItem("my_list"))
-
-console.log(previous_list)
-for(let i=0; i < previous_list.length ; i++){
- const title = previous_list[i]
-
- makeItem(title)
-
-}
+init();
